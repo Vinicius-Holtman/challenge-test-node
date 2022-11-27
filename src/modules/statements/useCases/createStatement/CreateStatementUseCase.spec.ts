@@ -59,4 +59,30 @@ describe("Create Statement", () => {
       })
     ).rejects.toBeInstanceOf(CreateStatementError.UserNotFound);
   });
+
+  it("should not be able to create a new statement with insufficient amount", async () => {
+    const user: ICreateUserDTO = {
+      name: "John Doe",
+      email: "johndoe@gmail.com",
+      password: "12345",
+    };
+
+    const { id } = await createUserUseCase.execute(user);
+
+    await createStatementUseCase.execute({
+      user_id: id as string,
+      type: "deposit" as any,
+      amount: 2000,
+      description: "description",
+    });
+
+    await expect(
+      createStatementUseCase.execute({
+        user_id: id as string,
+        type: "withdraw" as any,
+        amount: 3000,
+        description: "description",
+      })
+    ).rejects.toBeInstanceOf(CreateStatementError.InsufficientFunds);
+  });
 });
