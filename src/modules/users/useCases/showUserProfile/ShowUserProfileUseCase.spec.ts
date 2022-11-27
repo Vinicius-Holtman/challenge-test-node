@@ -1,4 +1,5 @@
 import { InMemoryUsersRepository } from "../../repositories/in-memory/InMemoryUsersRepository";
+import { ShowUserProfileError } from "./ShowUserProfileError";
 import { ShowUserProfileUseCase } from "./ShowUserProfileUseCase";
 
 let usersRepositoryInMemory: InMemoryUsersRepository;
@@ -19,8 +20,14 @@ describe("Get Info User Profile", () => {
       password: "12345",
     });
 
-    const findUser = await showUserProfileUseCase.execute(user.id as string)
+    const findUser = await showUserProfileUseCase.execute(user.id as string);
 
-    expect(findUser).toEqual(user)
+    expect(findUser).toEqual(user);
+  });
+
+  it("should not be able to show user profile with nonexistent user", async () => {
+    await expect(
+      showUserProfileUseCase.execute("mocked_user_id")
+    ).rejects.toBeInstanceOf(ShowUserProfileError);
   });
 });
