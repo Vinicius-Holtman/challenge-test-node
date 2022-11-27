@@ -74,4 +74,28 @@ describe("Get Statement", () => {
       });
     }).rejects.toBeInstanceOf(GetStatementOperationError.UserNotFound);
   });
+
+  it("should not be able to get a nonexistent statement", async () => {
+    const user: ICreateUserDTO = {
+      name: "John Doe",
+      email: "johndoe@gmail.com",
+      password: "12345",
+    };
+
+    const { id } = await createUserUseCase.execute(user);
+
+    await createStatementUseCase.execute({
+      user_id: id as string,
+      type: "deposit" as any,
+      amount: 2000,
+      description: "test description",
+    });
+
+    await expect(
+      getStatementOperationUseCase.execute({
+        user_id: id as string,
+        statement_id: "user_id_mocked",
+      })
+    ).rejects.toBeInstanceOf(GetStatementOperationError.StatementNotFound);
+  });
 });
