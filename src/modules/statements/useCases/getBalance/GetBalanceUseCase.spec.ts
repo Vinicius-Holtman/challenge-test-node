@@ -48,4 +48,11 @@ describe("Get Balance", () => {
 
     expect(balance).toHaveProperty("balance");
   });
+
+  it("should not be able to get balance to a nonexistent user", async () => {
+    expect(async () => {
+      await getBalanceUseCase.execute({user_id: "user_id_mocked"});
+
+    }).rejects.toBeInstanceOf(GetBalanceError);
+  });
 });
