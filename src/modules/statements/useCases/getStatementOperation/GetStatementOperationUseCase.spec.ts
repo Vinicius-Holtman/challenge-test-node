@@ -50,4 +50,28 @@ describe("Get Statement", () => {
 
     expect(balance).toHaveProperty("id");
   });
+
+  it("should not be able to get a statement to a nonexistent user", async () => {
+    await expect(async () => {
+      const user: ICreateUserDTO = {
+        name: "John Doe",
+        email: "johndoe@gmail.com",
+        password: "12345",
+      };
+
+      const { id } = await createUserUseCase.execute(user);
+
+      const statement = await createStatementUseCase.execute({
+        user_id: id as string,
+        type: "deposit" as any,
+        amount: 1000,
+        description: "description",
+      });
+
+      await getStatementOperationUseCase.execute({
+        user_id: "user_id_mocked",
+        statement_id: statement.id as string,
+      });
+    }).rejects.toBeInstanceOf(GetStatementOperationError.UserNotFound);
+  });
 });
