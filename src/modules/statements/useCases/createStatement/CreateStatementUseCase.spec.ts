@@ -39,4 +39,24 @@ describe("Create Statement", () => {
 
     expect(statement).toHaveProperty("id");
   });
+
+  
+  it("should not be able to create a new statement to a nonexisting user", async () => {
+    const user: ICreateUserDTO = {
+      name: "John Doe",
+      email: "johndoe@gmail.com",
+      password: "12345",
+    };
+
+    await createUserUseCase.execute(user);
+
+    await expect(
+      createStatementUseCase.execute({
+        user_id: "user_id_mocked",
+        type: "deposit" as any,
+        amount: 2000,
+        description: "description",
+      })
+    ).rejects.toBeInstanceOf(CreateStatementError.UserNotFound);
+  });
 });
